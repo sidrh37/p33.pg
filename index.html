@@ -291,12 +291,66 @@ body {
 .db-badge.err { border-color:var(--red);   color:var(--red); }
 .db-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
 
+/* LOGIN SCREEN */
+#loginScreen {
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  z-index:999;
+}
+.login-box {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:40px 36px; width:320px;
+  display:flex; flex-direction:column; align-items:center; gap:18px;
+  animation:popIn .2s ease;
+}
+.login-logo { font-family:'DM Mono',monospace; font-size:20px; color:var(--accent); letter-spacing:.1em; }
+.login-desc { font-size:12px; color:var(--text-muted); text-align:center; line-height:1.7; }
+.google-btn {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background:#fff; color:#333; border:none;
+  padding:11px 22px; border-radius:8px; cursor:pointer;
+  font-size:13px; font-weight:500; font-family:'Noto Sans KR',sans-serif;
+  transition:all .15s; width:100%;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.google-btn:hover { background:#f1f1f1; transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,.35); }
+.login-err { font-size:11px; color:var(--red); font-family:'DM Mono',monospace; display:none; }
+
+/* USER BADGE */
+.user-badge {
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; color:var(--text-dim);
+  padding:3px 9px 3px 4px; border-radius:20px;
+  border:1px solid var(--border); background:var(--surface2);
+  cursor:pointer; transition:all .15s;
+}
+.user-badge:hover { border-color:var(--red); color:var(--red); }
+.u-avatar {
+  width:22px; height:22px; border-radius:50%; overflow:hidden;
+  background:var(--accent); display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:#fff; font-weight:600; flex-shrink:0;
+}
+.u-avatar img { width:100%; height:100%; object-fit:cover; }
+
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 ::-webkit-scrollbar-track { background:transparent; }
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">PATCH·CAL</div>
+    <div class="login-desc">게임 업데이트 스케줄 캘린더<br>구글 계정으로 로그인하세요</div>
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="login-err" id="loginErr">로그인 중 오류가 발생했습니다</div>
+  </div>
+</div>
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -312,6 +366,10 @@ body {
   <div class="tb-right">
     <div class="db-badge" id="dbBadge">
       <div class="db-dot" id="dbDot"></div><span id="dbLabel">연결 중...</span>
+    </div>
+    <div class="user-badge" id="userBadge" onclick="logout()" title="로그아웃" style="display:none">
+      <div class="u-avatar" id="userAvatar"></div>
+      <span id="userName"></span>
     </div>
     <div class="view-toggle">
       <button class="view-btn active" id="btnMonth" onclick="setView('month')">월간</button>
@@ -459,23 +517,137 @@ body {
 // ══════════════════════════════════════
 const SB_URL = 'https://vhubkuqufbvncfjqxztc.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZodWJrdXF1ZmJ2bmNmanF4enRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMjYxNzQsImV4cCI6MjA4OTkwMjE3NH0.ZiAI9n52FymrA0NiQ0FvHqQ82ngG3L7jGP2fXAh_pU0';
-const SB_HDR = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+let accessToken = null; // set after login
+
+function sbHeaders() {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': `Bearer ${accessToken || SB_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
 
 async function sbGet(table, qs='') {
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?${qs}`, { headers: SB_HDR });
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${qs}`, { headers: sbHeaders() });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function sbUpsert(table, body) {
   const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
-    method: 'POST', headers: { ...SB_HDR, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+    method: 'POST',
+    headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
     body: JSON.stringify(body)
   });
   if (!r.ok) throw new Error(await r.text());
 }
 async function sbDelete(table, id) {
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, { method: 'DELETE', headers: SB_HDR });
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, { method: 'DELETE', headers: sbHeaders() });
   if (!r.ok) throw new Error(await r.text());
+}
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+async function loginWithGoogle() {
+  // OAuth redirect
+  const redirectTo = encodeURIComponent(location.href.split('?')[0].split('#')[0]);
+  location.href = `${SB_URL}/auth/v1/authorize?provider=google&redirect_to=${redirectTo}`;
+}
+
+async function logout() {
+  if (!confirm('로그아웃 하시겠어요?')) return;
+  await fetch(`${SB_URL}/auth/v1/logout`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${accessToken}` }
+  });
+  accessToken = null;
+  sessionStorage.removeItem('sb_access_token');
+  sessionStorage.removeItem('sb_refresh_token');
+  showLoginScreen();
+}
+
+function showLoginScreen() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('userBadge').style.display = 'none';
+}
+function hideLoginScreen(user) {
+  document.getElementById('loginScreen').style.display = 'none';
+  // show user badge
+  const badge = document.getElementById('userBadge');
+  const avatar = document.getElementById('userAvatar');
+  const nameEl = document.getElementById('userName');
+  badge.style.display = 'flex';
+  const name = user.user_metadata?.full_name || user.email || '';
+  const pic  = user.user_metadata?.avatar_url || '';
+  nameEl.textContent = name.split(' ')[0]; // first name only
+  if (pic) avatar.innerHTML = `<img src="${pic}" alt="">`;
+  else avatar.textContent = name.charAt(0).toUpperCase();
+}
+
+async function refreshSession(refreshToken) {
+  const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+  if (!r.ok) return null;
+  return r.json();
+}
+
+async function initAuth() {
+  // 1) Check URL hash for OAuth callback tokens
+  const hash = location.hash;
+  if (hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.replace('#', ''));
+    const at = params.get('access_token');
+    const rt = params.get('refresh_token');
+    if (at) {
+      accessToken = at;
+      sessionStorage.setItem('sb_access_token', at);
+      if (rt) sessionStorage.setItem('sb_refresh_token', rt);
+      history.replaceState(null, '', location.pathname); // clean URL
+    }
+  }
+
+  // 2) Try stored token
+  if (!accessToken) {
+    accessToken = sessionStorage.getItem('sb_access_token');
+  }
+
+  // 3) Validate token / get user
+  if (accessToken) {
+    try {
+      const r = await fetch(`${SB_URL}/auth/v1/user`, {
+        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${accessToken}` }
+      });
+      if (r.ok) {
+        const user = await r.json();
+        hideLoginScreen(user);
+        return true;
+      }
+      // token expired — try refresh
+      const rt = sessionStorage.getItem('sb_refresh_token');
+      if (rt) {
+        const data = await refreshSession(rt);
+        if (data?.access_token) {
+          accessToken = data.access_token;
+          sessionStorage.setItem('sb_access_token', data.access_token);
+          if (data.refresh_token) sessionStorage.setItem('sb_refresh_token', data.refresh_token);
+          const r2 = await fetch(`${SB_URL}/auth/v1/user`, {
+            headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${accessToken}` }
+          });
+          if (r2.ok) { hideLoginScreen(await r2.json()); return true; }
+        }
+      }
+    } catch(e) { console.warn('auth check failed', e); }
+  }
+
+  // 4) Not logged in
+  accessToken = null;
+  showLoginScreen();
+  return false;
 }
 
 function setBadge(state) { // 'loading' | 'ok' | 'err'
@@ -998,7 +1170,10 @@ document.addEventListener('click', e=>{
 // ══════════════════════════════════════
 miniY=curYear; miniM=curMonth;
 setBadge('loading');
-syncAll();
+(async () => {
+  const loggedIn = await initAuth();
+  if (loggedIn) syncAll();
+})();
 </script>
 </body>
 </html>
