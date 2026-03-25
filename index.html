@@ -391,10 +391,10 @@ body {
   align-content:start;
 }
 /* size variants */
-.memo-grid[data-size="50"]  { --card-min:120px; }
-.memo-grid[data-size="100"] { --card-min:240px; }
-.memo-grid[data-size="150"] { --card-min:360px; }
-.memo-grid[data-size="200"] { --card-min:480px; }
+.memo-grid[data-size="50"]  { --card-min:120px; --card-img:84px; }
+.memo-grid[data-size="100"] { --card-min:240px; --card-img:168px; }
+.memo-grid[data-size="150"] { --card-min:360px; --card-img:252px; }
+.memo-grid[data-size="200"] { --card-min:480px; --card-img:336px; }
 
 .memo-card {
   background:var(--surface); border:1px solid var(--border);
@@ -402,7 +402,7 @@ body {
   transition:all .15s; display:flex; flex-direction:column;
 }
 .memo-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.3); }
-.memo-card-img { width:100%; height:calc(var(--card-min, 120px) * 0.7); object-fit:cover; display:block; flex-shrink:0; }
+.memo-card-img { width:100%; height:var(--card-img, 168px); object-fit:cover; display:block; flex-shrink:0; }
 .memo-card-img-placeholder { width:100%; height:0; }
 .memo-card-body { padding:11px 13px; flex:1; }
 .memo-card-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -613,15 +613,15 @@ body {
     <div class="memo-topbar-title">메모</div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="size-toggle">
-        <button class="size-btn active" data-size="50"  onclick="setMemoSize(50)">50%</button>
-        <button class="size-btn"        data-size="100" onclick="setMemoSize(100)">100%</button>
+        <button class="size-btn"        data-size="50"  onclick="setMemoSize(50)">50%</button>
+        <button class="size-btn active" data-size="100" onclick="setMemoSize(100)">100%</button>
         <button class="size-btn"        data-size="150" onclick="setMemoSize(150)">150%</button>
         <button class="size-btn"        data-size="200" onclick="setMemoSize(200)">200%</button>
       </div>
       <button class="new-memo-btn" onclick="newMemo()">+ 새 메모</button>
     </div>
   </div>
-  <div class="memo-grid" id="memoGrid" data-size="50"></div>
+  <div class="memo-grid" id="memoGrid" data-size="100"></div>
 </div>
 
 <!-- MEMO MODAL -->
@@ -1555,7 +1555,7 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
 miniY=curYear; miniM=curMonth;
 setBadge('loading');
 // restore memo card size
-const savedSize = parseInt(localStorage.getItem('pgcal_memo_size') || '50');
+const savedSize = parseInt(localStorage.getItem('pgcal_memo_size') || '100');
 setMemoSize(savedSize);
 (async () => {
   const loggedIn = await initAuth();
