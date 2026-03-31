@@ -334,6 +334,80 @@ body {
 }
 .u-avatar img { width:100%; height:100%; object-fit:cover; }
 
+/* ── REVENUE TAB ─────────────────────── */
+#revenueTab {
+  display:none; flex:1; flex-direction:column; overflow:hidden; background:var(--bg);
+}
+.rev-topbar {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:10px 18px; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.rev-date-box {
+  display:flex; flex-direction:column; align-items:flex-start;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; padding:5px 12px; cursor:pointer; transition:border-color .12s; min-width:160px;
+}
+.rev-date-box:hover { border-color:var(--accent); }
+.rev-date-label { font-size:9px; color:var(--text-muted); font-family:'DM Mono',monospace; margin-bottom:2px; }
+.rev-date-val { font-size:12px; color:var(--text); font-family:'DM Mono',monospace; }
+.rev-date-input { opacity:0; position:absolute; pointer-events:none; }
+.rev-unit-toggle { display:flex; background:var(--surface2); border:1px solid var(--border); border-radius:7px; overflow:hidden; margin-left:auto; }
+.rev-unit-btn { padding:5px 14px; font-size:11px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; background:transparent; border:none; color:var(--text-muted); transition:all .12s; }
+.rev-unit-btn.active { background:var(--accent); color:#fff; }
+.rev-upload-btn {
+  display:flex; align-items:center; gap:5px;
+  background:var(--surface2); border:1px solid var(--border);
+  color:var(--text-dim); padding:6px 13px; border-radius:7px;
+  font-size:11px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; transition:all .12s;
+}
+.rev-upload-btn:hover { border-color:var(--accent); color:var(--text); }
+.rev-clear-btn {
+  background:none; border:1px solid var(--border); color:var(--text-muted);
+  padding:5px 10px; border-radius:6px; font-size:10px; font-family:'DM Mono',monospace; cursor:pointer;
+}
+.rev-clear-btn:hover { border-color:var(--red); color:var(--red); }
+
+.rev-body { flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:16px; }
+
+/* empty state */
+.rev-empty {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; color:var(--text-muted); font-size:13px;
+}
+.rev-empty-icon { font-size:36px; opacity:.4; }
+.rev-empty-sub { font-size:11px; opacity:.6; }
+
+/* chart card */
+.rev-chart-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:16px; overflow:hidden;
+}
+.rev-chart-title { font-size:12px; font-weight:500; color:var(--text); margin-bottom:12px; }
+.rev-chart-wrap { position:relative; height:220px; }
+
+/* sub charts row */
+.rev-sub-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+}
+.rev-sub-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:12px; overflow:hidden;
+}
+.rev-sub-title { font-size:10px; color:var(--text-muted); margin-bottom:8px; font-family:'DM Mono',monospace; letter-spacing:.05em; }
+.rev-sub-wrap { position:relative; height:120px; }
+
+/* stats bar */
+.rev-stats { display:flex; gap:10px; flex-wrap:wrap; }
+.rev-stat {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px; flex:1; min-width:120px;
+}
+.rev-stat-label { font-size:9px; color:var(--text-muted); font-family:'DM Mono',monospace; margin-bottom:4px; }
+.rev-stat-val { font-size:15px; font-weight:500; color:var(--text); font-family:'DM Mono',monospace; }
+.rev-stat-sub { font-size:9px; margin-top:2px; font-family:'DM Mono',monospace; }
+.rev-stat-sub.up { color:var(--green); }
+.rev-stat-sub.down { color:var(--red); }
+
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 ::-webkit-scrollbar-track { background:transparent; }
@@ -536,6 +610,9 @@ body {
   <button class="tab-btn" id="tabBtnMemo" onclick="switchTab('memo')">
     <span class="tab-icon">📝</span> 메모
   </button>
+  <button class="tab-btn" id="tabBtnRevenue" onclick="switchTab('revenue')">
+    <span class="tab-icon">📊</span> 매출
+  </button>
 
   <!-- cal controls live here, hidden when on other tabs -->
   <div id="calControls">
@@ -643,6 +720,85 @@ body {
       </label>
       <span class="memo-saved-badge" id="memoSavedBadge">✓ 저장됨</span>
       <button class="memo-save-btn" onclick="saveMemo()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: REVENUE -->
+<div id="revenueTab">
+  <div class="rev-topbar">
+    <!-- date pickers (shown only when data loaded) -->
+    <div id="revDateControls" style="display:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1">
+      <label class="rev-date-box" for="revDateStart">
+        <span class="rev-date-label">확인 날짜</span>
+        <span class="rev-date-val" id="revDateStartVal">날짜 선택</span>
+        <input type="date" id="revDateStart" class="rev-date-input" onchange="updateRevDateLabel()">
+      </label>
+      <span style="color:var(--text-muted);font-size:12px">~</span>
+      <label class="rev-date-box" for="revDateEnd">
+        <span class="rev-date-label" style="display:flex;justify-content:space-between;width:100%">
+          <span>확인 날짜 (종료)</span>
+        </span>
+        <span class="rev-date-val" id="revDateEndVal">날짜 선택</span>
+        <input type="date" id="revDateEnd" class="rev-date-input" onchange="updateRevDateLabel()">
+      </label>
+      <div style="width:1px;height:30px;background:var(--border)"></div>
+      <label class="rev-date-box" for="revCmpStart" style="border-style:dashed">
+        <span class="rev-date-label">비교 날짜 (선택)</span>
+        <span class="rev-date-val" id="revCmpStartVal" style="color:var(--yellow)">설정 안됨</span>
+        <input type="date" id="revCmpStart" class="rev-date-input" onchange="updateRevDateLabel()">
+      </label>
+      <span style="color:var(--text-muted);font-size:12px">~</span>
+      <label class="rev-date-box" for="revCmpEnd" style="border-style:dashed">
+        <span class="rev-date-label">비교 날짜 (종료)</span>
+        <span class="rev-date-val" id="revCmpEndVal" style="color:var(--yellow)">설정 안됨</span>
+        <input type="date" id="revCmpEnd" class="rev-date-input" onchange="updateRevDateLabel()">
+      </label>
+      <button class="rev-clear-btn" onclick="clearRevCmp()">비교 초기화</button>
+      <div class="rev-unit-toggle" style="margin-left:auto">
+        <button class="rev-unit-btn active" id="revUnitDay" onclick="setRevUnit('day')">일</button>
+        <button class="rev-unit-btn" id="revUnitMonth" onclick="setRevUnit('month')">월</button>
+      </div>
+    </div>
+    <!-- upload button always visible -->
+    <label class="rev-upload-btn" id="revUploadLabel">
+      📂 엑셀 파일 업로드
+      <input type="file" accept=".xlsx,.xls" style="display:none" onchange="loadRevExcel(this)">
+    </label>
+  </div>
+  <div class="rev-body" id="revBody">
+    <div class="rev-empty" id="revEmpty">
+      <div class="rev-empty-icon">📊</div>
+      <div>매출 데이터가 없습니다</div>
+      <div class="rev-empty-sub">엑셀 파일을 업로드하면 그래프가 표시됩니다<br>(<b>2026년 매출 지표</b> 시트 사용)</div>
+    </div>
+    <div id="revCharts" style="display:none;flex-direction:column;gap:16px">
+      <!-- stats -->
+      <div class="rev-stats" id="revStats"></div>
+      <!-- main chart -->
+      <div class="rev-chart-card">
+        <div class="rev-chart-title">총 정산 매출 ($)</div>
+        <div class="rev-chart-wrap"><canvas id="revMainChart"></canvas></div>
+      </div>
+      <!-- sub charts -->
+      <div class="rev-sub-grid">
+        <div class="rev-sub-card">
+          <div class="rev-sub-title">Google Play (정산 85%)</div>
+          <div class="rev-sub-wrap"><canvas id="revGoogleChart"></canvas></div>
+        </div>
+        <div class="rev-sub-card">
+          <div class="rev-sub-title">App Store (정산 85%)</div>
+          <div class="rev-sub-wrap"><canvas id="revAppStoreChart"></canvas></div>
+        </div>
+        <div class="rev-sub-card">
+          <div class="rev-sub-title">EroLabs (정산 40%)</div>
+          <div class="rev-sub-wrap"><canvas id="revEroLabsChart"></canvas></div>
+        </div>
+        <div class="rev-sub-card">
+          <div class="rev-sub-title">Steam (정산 65%)</div>
+          <div class="rev-sub-wrap"><canvas id="revSteamChart"></canvas></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1391,11 +1547,13 @@ document.addEventListener('click', e=>{
 // TABS
 // ══════════════════════════════════════
 function switchTab(tab) {
-  document.getElementById('calTab').style.display   = tab==='cal'  ? 'flex' : 'none';
-  document.getElementById('memoTab').style.display  = tab==='memo' ? 'flex' : 'none';
-  document.getElementById('calControls').style.display = tab==='cal' ? 'flex' : 'none';
-  document.getElementById('tabBtnCal').classList.toggle('active',  tab==='cal');
-  document.getElementById('tabBtnMemo').classList.toggle('active', tab==='memo');
+  document.getElementById('calTab').style.display      = tab==='cal'     ? 'flex' : 'none';
+  document.getElementById('memoTab').style.display     = tab==='memo'    ? 'flex' : 'none';
+  document.getElementById('revenueTab').style.display  = tab==='revenue' ? 'flex' : 'none';
+  document.getElementById('calControls').style.display = tab==='cal'     ? 'flex' : 'none';
+  document.getElementById('tabBtnCal').classList.toggle('active',     tab==='cal');
+  document.getElementById('tabBtnMemo').classList.toggle('active',    tab==='memo');
+  document.getElementById('tabBtnRevenue').classList.toggle('active', tab==='revenue');
   if (tab==='memo') syncMemos();
 }
 
@@ -1548,6 +1706,184 @@ async function removeImage(idx) {
 }
 function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// ══════════════════════════════════════
+// REVENUE TAB
+// ══════════════════════════════════════
+let revData = [];       // [{date, total, google, appstore, erolabs, steam}]
+let revUnit = 'day';    // 'day' | 'month'
+let revChartInstances = {};
+
+// Chart.js CDN 동적 로드
+function loadChartJS(cb) {
+  if (window.Chart) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+  s.onload = cb; document.head.appendChild(s);
+}
+
+// SheetJS CDN 동적 로드
+function loadSheetJS(cb) {
+  if (window.XLSX) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = cb; document.head.appendChild(s);
+}
+
+function loadRevExcel(input) {
+  const file = input.files[0]; if (!file) return;
+  showToast('파일 읽는 중...');
+  loadSheetJS(() => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array' });
+        const sheetName = wb.SheetNames.find(n => n.includes('매출 지표'));
+        if (!sheetName) { showToast('❌ "매출 지표" 시트를 찾을 수 없습니다', 3000); return; }
+        const ws = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        // Data starts at row index 4 (0-based), columns: A=0,B=1,C=2,F=5,J=9,K=10(AppStore부분유료),N=13,P=15
+        // J=Google settlement(85%), L=AppStore settlement(85%), N=EroLabs settlement(40%), P=Steam settlement(65%)
+        revData = [];
+        for (let i = 4; i < rows.length; i++) {
+          const row = rows[i];
+          const yr = row[0], mo = row[1], dy = row[2];
+          if (!yr || !mo || !dy) continue;
+          const total    = parseFloat(row[5])  || 0;
+          const google   = parseFloat(row[9])  || 0;   // J: Google 정산 85%
+          const appstore = parseFloat(row[11]) || 0;   // L: AppStore 정산 85%
+          const erolabs  = parseFloat(row[13]) || 0;   // N: EroLabs 정산 40%
+          const steam    = parseFloat(row[15]) || 0;   // P: Steam 정산 65%
+          const dateStr  = `${Math.round(yr)}-${String(Math.round(mo)).padStart(2,'0')}-${String(Math.round(dy)).padStart(2,'0')}`;
+          revData.push({ date: dateStr, total, google, appstore, erolabs, steam });
+        }
+        revData.sort((a,b) => a.date.localeCompare(b.date));
+        if (!revData.length) { showToast('❌ 데이터를 읽을 수 없습니다', 3000); return; }
+        // Set date range to full range
+        const minDate = revData[0].date, maxDate = revData[revData.length-1].date;
+        document.getElementById('revDateStart').value = minDate;
+        document.getElementById('revDateEnd').value   = maxDate;
+        document.getElementById('revDateControls').style.display = 'flex';
+        updateRevDateLabel();
+        document.getElementById('revEmpty').style.display  = 'none';
+        document.getElementById('revCharts').style.display = 'flex';
+        showToast(`✓ ${revData.length}일 데이터 로드 완료`);
+        loadChartJS(renderRevCharts);
+      } catch(err) { showToast('❌ 파일 읽기 실패: ' + err.message, 4000); console.error(err); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+  input.value = '';
+}
+
+function updateRevDateLabel() {
+  const sv = document.getElementById('revDateStart').value;
+  const ev = document.getElementById('revDateEnd').value;
+  const csv = document.getElementById('revCmpStart').value;
+  const cev = document.getElementById('revCmpEnd').value;
+  document.getElementById('revDateStartVal').textContent = sv || '날짜 선택';
+  document.getElementById('revDateEndVal').textContent   = ev || '날짜 선택';
+  document.getElementById('revCmpStartVal').textContent  = csv || '설정 안됨';
+  document.getElementById('revCmpEndVal').textContent    = cev || '설정 안됨';
+  if (revData.length && window.Chart) renderRevCharts();
+}
+
+function clearRevCmp() {
+  document.getElementById('revCmpStart').value = '';
+  document.getElementById('revCmpEnd').value   = '';
+  updateRevDateLabel();
+}
+
+function setRevUnit(unit) {
+  revUnit = unit;
+  document.getElementById('revUnitDay').classList.toggle('active',   unit==='day');
+  document.getElementById('revUnitMonth').classList.toggle('active', unit==='month');
+  if (revData.length && window.Chart) renderRevCharts();
+}
+
+function getFilteredData(startDate, endDate) {
+  return revData.filter(d => (!startDate || d.date >= startDate) && (!endDate || d.date <= endDate));
+}
+
+function aggregateByMonth(data) {
+  const map = {};
+  data.forEach(d => {
+    const key = d.date.slice(0, 7); // YYYY-MM
+    if (!map[key]) map[key] = { date: key, total:0, google:0, appstore:0, erolabs:0, steam:0 };
+    map[key].total    += d.total;
+    map[key].google   += d.google;
+    map[key].appstore += d.appstore;
+    map[key].erolabs  += d.erolabs;
+    map[key].steam    += d.steam;
+  });
+  return Object.values(map).sort((a,b) => a.date.localeCompare(b.date));
+}
+
+function fmt$(v) { return '$' + v.toLocaleString('en-US', { minimumFractionDigits:0, maximumFractionDigits:0 }); }
+
+function renderRevCharts() {
+  const s1 = document.getElementById('revDateStart').value;
+  const e1 = document.getElementById('revDateEnd').value;
+  const s2 = document.getElementById('revCmpStart').value;
+  const e2 = document.getElementById('revCmpEnd').value;
+  const hasCmp = s2 && e2;
+
+  let d1 = getFilteredData(s1, e1);
+  let d2 = hasCmp ? getFilteredData(s2, e2) : [];
+  if (revUnit === 'month') { d1 = aggregateByMonth(d1); d2 = aggregateByMonth(d2); }
+
+  const labels1 = d1.map(d => revUnit === 'month' ? d.date.slice(5) + '월' : d.date.slice(5).replace('-','/'));
+  const labels2 = d2.map(d => revUnit === 'month' ? d.date.slice(5) + '월' : d.date.slice(5).replace('-','/'));
+
+  // Stats
+  const statsEl = document.getElementById('revStats');
+  const sum1 = d1.reduce((a,d) => a+d.total, 0);
+  const sum2 = d2.reduce((a,d) => a+d.total, 0);
+  const avg1 = d1.length ? sum1/d1.length : 0;
+  const max1 = d1.length ? Math.max(...d1.map(d=>d.total)) : 0;
+  statsEl.innerHTML = `
+    <div class="rev-stat"><div class="rev-stat-label">총 매출 (확인)</div><div class="rev-stat-val">${fmt$(sum1)}</div>${hasCmp?`<div class="rev-stat-sub ${sum1>=sum2?'up':'down'}">${sum1>=sum2?'▲':'▼'} vs 비교 ${fmt$(Math.abs(sum1-sum2))}</div>`:''}
+    </div>
+    <div class="rev-stat"><div class="rev-stat-label">평균 ${revUnit==='day'?'일':'월'}매출</div><div class="rev-stat-val">${fmt$(avg1)}</div></div>
+    <div class="rev-stat"><div class="rev-stat-label">최고 ${revUnit==='day'?'일':'월'}매출</div><div class="rev-stat-val">${fmt$(max1)}</div></div>
+    ${hasCmp?`<div class="rev-stat"><div class="rev-stat-label">총 매출 (비교)</div><div class="rev-stat-val">${fmt$(sum2)}</div></div>`:''}
+  `;
+
+  // Chart color palette
+  const C = { main:'#5b6af0', cmp:'#f0b429', google:'#3dd68c', appstore:'#38c4d4', erolabs:'#b45bf0', steam:'#f05b7a' };
+  const grid = { color:'rgba(42,43,58,0.6)' };
+  const chartDefaults = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => fmt$(ctx.parsed.y) } } },
+    scales:{
+      x:{ ticks:{ color:'#5c5f78', font:{size:9} }, grid },
+      y:{ ticks:{ color:'#5c5f78', font:{size:9}, callback: v => '$'+v.toLocaleString() }, grid }
+    }
+  };
+
+  function mkDatasets(key, color) {
+    const ds = [{ label:'확인', data: d1.map(d=>d[key]), borderColor:color, backgroundColor:color+'28', fill:true, tension:.3, pointRadius:2, pointHoverRadius:4, borderWidth:2 }];
+    if (hasCmp) ds.push({ label:'비교', data: d2.map(d=>d[key]), borderColor:C.cmp, backgroundColor:C.cmp+'28', fill:true, tension:.3, pointRadius:2, pointHoverRadius:4, borderWidth:2, borderDash:[4,3] });
+    return ds;
+  }
+
+  function drawChart(id, key, color, labels) {
+    if (revChartInstances[id]) revChartInstances[id].destroy();
+    const ctx = document.getElementById(id).getContext('2d');
+    // Use longer label set (compare mode: use d1 labels for main axis)
+    revChartInstances[id] = new Chart(ctx, {
+      type:'line',
+      data:{ labels, datasets: mkDatasets(key, color) },
+      options:{ ...chartDefaults, plugins:{ ...chartDefaults.plugins, legend:{ display: hasCmp, labels:{ color:'#8b8fa8', font:{size:10}, boxWidth:12 } } } }
+    });
+  }
+
+  drawChart('revMainChart',    'total',    C.main,     labels1);
+  drawChart('revGoogleChart',  'google',   C.google,   labels1);
+  drawChart('revAppStoreChart','appstore', C.appstore, labels1);
+  drawChart('revEroLabsChart', 'erolabs', C.erolabs,  labels1);
+  drawChart('revSteamChart',   'steam',    C.steam,    labels1);
+}
 
 // ══════════════════════════════════════
 // INIT
