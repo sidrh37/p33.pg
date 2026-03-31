@@ -396,6 +396,43 @@ body {
 .rev-sub-title { font-size:10px; color:var(--text-muted); margin-bottom:8px; font-family:'DM Mono',monospace; letter-spacing:.05em; }
 .rev-sub-wrap { position:relative; height:120px; }
 
+/* sales table section */
+.rev-sales-section { display:flex; flex-direction:column; gap:10px; }
+.rev-sales-period-label {
+  font-size:10px; font-family:'DM Mono',monospace; color:var(--text-muted);
+  letter-spacing:.06em; padding:6px 2px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.rev-period-badge {
+  font-size:9px; padding:2px 8px; border-radius:4px; font-family:'DM Mono',monospace;
+}
+.rev-period-badge.main { background:rgba(91,106,240,.2); color:#9aa3f5; }
+.rev-period-badge.cmp  { background:rgba(240,180,41,.15); color:var(--yellow); }
+.rev-platform-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.rev-platform-block {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+}
+.rev-platform-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface2);
+}
+.rev-platform-name { font-size:11px; font-weight:500; color:var(--text); }
+.rev-platform-total { font-size:9px; color:var(--text-muted); font-family:'DM Mono',monospace; }
+.rev-product-table { width:100%; border-collapse:collapse; }
+.rev-product-table th {
+  text-align:left; font-size:9px; color:var(--text-muted); font-family:'DM Mono',monospace;
+  padding:5px 10px; border-bottom:1px solid var(--border); font-weight:400;
+}
+.rev-product-table th:last-child { text-align:right; }
+.rev-product-table td { padding:5px 10px; border-bottom:1px solid rgba(42,43,58,.4); vertical-align:middle; }
+.rev-product-table td:last-child { text-align:right; font-family:'DM Mono',monospace; font-size:10px; color:var(--text); }
+.rev-product-table tr:last-child td { border-bottom:none; }
+.rev-product-table tr:hover td { background:var(--surface2); }
+.rev-rank { font-size:9px; color:var(--text-muted); font-family:'DM Mono',monospace; width:22px; display:inline-block; }
+.rev-prod-name { font-size:11px; color:var(--text-dim); }
+.rev-no-data { padding:14px; font-size:11px; color:var(--text-muted); text-align:center; }
+
 /* stats bar */
 .rev-stats { display:flex; gap:10px; flex-wrap:wrap; }
 .rev-stat {
@@ -799,6 +836,8 @@ body {
           <div class="rev-sub-wrap"><canvas id="revSteamChart"></canvas></div>
         </div>
       </div>
+      <!-- sales tables -->
+      <div class="rev-sales-section" id="revSalesSection"></div>
     </div>
   </div>
 </div>
@@ -1713,6 +1752,8 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
 let revData = [];       // [{date, total, google, appstore, erolabs, steam}]
 let revUnit = 'day';    // 'day' | 'month'
 let revChartInstances = {};
+let shopProducts = {};  // {id: name} — cash products from SHOP sheet
+let salesData = [];     // [{date, productId, count, platform}] from TotalData
 
 // Chart.js CDN 동적 로드
 function loadChartJS(cb) {
@@ -1738,28 +1779,60 @@ function loadRevExcel(input) {
     reader.onload = e => {
       try {
         const wb = XLSX.read(e.target.result, { type: 'array' });
+
+        // ── 1. 매출 지표 시트 ──────────────
         const sheetName = wb.SheetNames.find(n => n.includes('매출 지표'));
         if (!sheetName) { showToast('❌ "매출 지표" 시트를 찾을 수 없습니다', 3000); return; }
         const ws = wb.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
-        // Data starts at row index 4 (0-based), columns: A=0,B=1,C=2,F=5,J=9,K=10(AppStore부분유료),N=13,P=15
-        // J=Google settlement(85%), L=AppStore settlement(85%), N=EroLabs settlement(40%), P=Steam settlement(65%)
         revData = [];
         for (let i = 4; i < rows.length; i++) {
           const row = rows[i];
           const yr = row[0], mo = row[1], dy = row[2];
           if (!yr || !mo || !dy) continue;
           const total    = parseFloat(row[5])  || 0;
-          const google   = parseFloat(row[9])  || 0;   // J: Google 정산 85%
-          const appstore = parseFloat(row[11]) || 0;   // L: AppStore 정산 85%
-          const erolabs  = parseFloat(row[13]) || 0;   // N: EroLabs 정산 40%
-          const steam    = parseFloat(row[15]) || 0;   // P: Steam 정산 65%
+          const google   = parseFloat(row[9])  || 0;
+          const appstore = parseFloat(row[11]) || 0;
+          const erolabs  = parseFloat(row[13]) || 0;
+          const steam    = parseFloat(row[15]) || 0;
           const dateStr  = `${Math.round(yr)}-${String(Math.round(mo)).padStart(2,'0')}-${String(Math.round(dy)).padStart(2,'0')}`;
           revData.push({ date: dateStr, total, google, appstore, erolabs, steam });
         }
         revData.sort((a,b) => a.date.localeCompare(b.date));
+
+        // ── 2. SHOP 시트 (현금 상품 목록) ──
+        shopProducts = {};
+        if (wb.Sheets['SHOP']) {
+          const shopRows = XLSX.utils.sheet_to_json(wb.Sheets['SHOP'], { header: 1, defval: null });
+          for (let i = 3; i < shopRows.length; i++) {
+            const r = shopRows[i];
+            if (r[0] == null) continue;
+            const idx   = Math.round(r[0]);
+            const name  = r[1] || '';
+            const cost1 = r[6]; // '현금' or '재화'
+            if (cost1 === '현금') shopProducts[idx] = name;
+          }
+        }
+
+        // ── 3. TotalData 시트 ───────────────
+        salesData = [];
+        if (wb.Sheets['TotalData']) {
+          const tdRows = XLSX.utils.sheet_to_json(wb.Sheets['TotalData'], { header: 1, defval: null });
+          // header row 0: [null, result, table, _start, _stop, total_count, _measurement, platform]
+          for (let i = 1; i < tdRows.length; i++) {
+            const r = tdRows[i];
+            const startRaw = r[3]; // '2026-03-23T00:00:00Z'
+            if (!startRaw) continue;
+            const date      = String(startRaw).slice(0, 10);
+            const count     = parseFloat(r[5]) || 0;
+            const productId = r[6] != null ? Math.round(r[6]) : null;
+            const platform  = r[7] || '';
+            if (productId == null || !shopProducts[productId]) continue; // cash only
+            salesData.push({ date, productId, count, platform });
+          }
+        }
+
         if (!revData.length) { showToast('❌ 데이터를 읽을 수 없습니다', 3000); return; }
-        // Set date range to full range
         const minDate = revData[0].date, maxDate = revData[revData.length-1].date;
         document.getElementById('revDateStart').value = minDate;
         document.getElementById('revDateEnd').value   = maxDate;
@@ -1767,7 +1840,7 @@ function loadRevExcel(input) {
         updateRevDateLabel();
         document.getElementById('revEmpty').style.display  = 'none';
         document.getElementById('revCharts').style.display = 'flex';
-        showToast(`✓ ${revData.length}일 데이터 로드 완료`);
+        showToast(`✓ ${revData.length}일 매출 + ${salesData.length}건 판매 데이터 로드`);
         loadChartJS(renderRevCharts);
       } catch(err) { showToast('❌ 파일 읽기 실패: ' + err.message, 4000); console.error(err); }
     };
@@ -1883,6 +1956,90 @@ function renderRevCharts() {
   drawChart('revAppStoreChart','appstore', C.appstore, labels1);
   drawChart('revEroLabsChart', 'erolabs', C.erolabs,  labels1);
   drawChart('revSteamChart',   'steam',    C.steam,    labels1);
+
+  // render sales tables below charts
+  renderSalesTables(s1, e1, s2, e2);
+}
+
+function getSalesTable(startDate, endDate) {
+  // Filter salesData by date range, group by platform → productId → sum count
+  const filtered = salesData.filter(d => (!startDate || d.date >= startDate) && (!endDate || d.date <= endDate));
+  // platform → {productId → count}
+  const map = {};
+  filtered.forEach(d => {
+    if (!map[d.platform]) map[d.platform] = {};
+    map[d.platform][d.productId] = (map[d.platform][d.productId] || 0) + d.count;
+  });
+  return map;
+}
+
+function buildPlatformTable(platformMap, platform, colorClass) {
+  const data = platformMap[platform] || {};
+  const sorted = Object.entries(data)
+    .map(([id, cnt]) => ({ id: parseInt(id), name: shopProducts[parseInt(id)] || `ID:${id}`, cnt }))
+    .sort((a, b) => b.cnt - a.cnt);
+  const total = sorted.reduce((s, r) => s + r.cnt, 0);
+
+  const block = document.createElement('div');
+  block.className = 'rev-platform-block';
+
+  const platformLabel = { Google:'Google Play', AppStore:'App Store', EroLabs:'EroLabs', Steam:'Steam' };
+  block.innerHTML = `
+    <div class="rev-platform-header">
+      <span class="rev-platform-name">${platformLabel[platform] || platform}</span>
+      <span class="rev-platform-total">총 ${total.toLocaleString()}건</span>
+    </div>`;
+
+  if (!sorted.length) {
+    block.innerHTML += `<div class="rev-no-data">해당 기간 데이터 없음</div>`;
+  } else {
+    const table = document.createElement('table');
+    table.className = 'rev-product-table';
+    table.innerHTML = `<thead><tr><th>#</th><th>상품명</th><th>판매수</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    sorted.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><span class="rev-rank">${i+1}</span></td><td class="rev-prod-name">${r.name}</td><td>${r.cnt.toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    block.appendChild(table);
+  }
+  return block;
+}
+
+function renderSalesTables(s1, e1, s2, e2) {
+  const section = document.getElementById('revSalesSection');
+  section.innerHTML = '';
+  if (!salesData.length) return;
+
+  const platforms = ['Google', 'AppStore', 'EroLabs', 'Steam'];
+
+  // ── Main period ───────────────────────
+  const mainMap = getSalesTable(s1, e1);
+  const mainLabel = document.createElement('div');
+  mainLabel.className = 'rev-sales-period-label';
+  mainLabel.innerHTML = `판매 상품 현황 <span class="rev-period-badge main">${s1||'전체'} ~ ${e1||'전체'}</span> <span style="font-size:9px;color:var(--text-muted)">(현금 상품만)</span>`;
+  section.appendChild(mainLabel);
+
+  const mainGrid = document.createElement('div');
+  mainGrid.className = 'rev-platform-grid';
+  platforms.forEach(p => mainGrid.appendChild(buildPlatformTable(mainMap, p)));
+  section.appendChild(mainGrid);
+
+  // ── Compare period (optional) ─────────
+  if (s2 && e2) {
+    const cmpMap = getSalesTable(s2, e2);
+    const cmpLabel = document.createElement('div');
+    cmpLabel.className = 'rev-sales-period-label';
+    cmpLabel.innerHTML = `판매 상품 현황 <span class="rev-period-badge cmp">비교 ${s2} ~ ${e2}</span> <span style="font-size:9px;color:var(--text-muted)">(현금 상품만)</span>`;
+    section.appendChild(cmpLabel);
+
+    const cmpGrid = document.createElement('div');
+    cmpGrid.className = 'rev-platform-grid';
+    platforms.forEach(p => cmpGrid.appendChild(buildPlatformTable(cmpMap, p)));
+    section.appendChild(cmpGrid);
+  }
 }
 
 // ══════════════════════════════════════
