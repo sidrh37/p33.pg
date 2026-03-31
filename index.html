@@ -1804,12 +1804,13 @@ function loadRevExcel(input) {
         shopProducts = {};
         if (wb.Sheets['SHOP']) {
           const shopRows = XLSX.utils.sheet_to_json(wb.Sheets['SHOP'], { header: 1, defval: null });
-          for (let i = 3; i < shopRows.length; i++) {
+          // Row 0: empty, Row 1: headers (Index_A=col0, Name=col1, Cost1_DEV=col6), Row 2: empty, Row 3+: data
+          for (let i = 0; i < shopRows.length; i++) {
             const r = shopRows[i];
-            if (r[0] == null) continue;
+            if (r[0] == null || typeof r[0] !== 'number') continue; // skip non-data rows
             const idx   = Math.round(r[0]);
             const name  = r[1] || '';
-            const cost1 = r[6]; // '현금' or '재화'
+            const cost1 = r[6]; // '현금' or '인게임재화' or '무료 상품'
             if (cost1 === '현금') shopProducts[idx] = name;
           }
         }
@@ -1818,21 +1819,23 @@ function loadRevExcel(input) {
         salesData = [];
         if (wb.Sheets['TotalData']) {
           const tdRows = XLSX.utils.sheet_to_json(wb.Sheets['TotalData'], { header: 1, defval: null });
-          // header row 0: [null, result, table, _start, _stop, total_count, _measurement, platform]
+          // Col A(0)=None, B(1)=result, C(2)=table, D(3)=_start, E(4)=_stop, F(5)=total_count, G(6)=_measurement, H(7)=platform
           for (let i = 1; i < tdRows.length; i++) {
             const r = tdRows[i];
             const startRaw = r[3]; // '2026-03-23T00:00:00Z'
-            if (!startRaw) continue;
-            const date      = String(startRaw).slice(0, 10);
+            if (!startRaw || typeof startRaw !== 'string') continue;
+            const date      = startRaw.slice(0, 10);
             const count     = parseFloat(r[5]) || 0;
             const productId = r[6] != null ? Math.round(r[6]) : null;
             const platform  = r[7] || '';
-            if (productId == null || !shopProducts[productId]) continue; // cash only
+            if (productId == null) continue;
+            if (!shopProducts[productId]) continue; // cash only
             salesData.push({ date, productId, count, platform });
           }
         }
 
         if (!revData.length) { showToast('❌ 데이터를 읽을 수 없습니다', 3000); return; }
+        const cashCount = Object.keys(shopProducts).length;
         const minDate = revData[0].date, maxDate = revData[revData.length-1].date;
         document.getElementById('revDateStart').value = minDate;
         document.getElementById('revDateEnd').value   = maxDate;
@@ -1840,7 +1843,7 @@ function loadRevExcel(input) {
         updateRevDateLabel();
         document.getElementById('revEmpty').style.display  = 'none';
         document.getElementById('revCharts').style.display = 'flex';
-        showToast(`✓ ${revData.length}일 매출 + ${salesData.length}건 판매 데이터 로드`);
+        showToast(`✓ 매출 ${revData.length}일 / 현금상품 ${cashCount}종 / 판매 ${salesData.length}건`);
         loadChartJS(renderRevCharts);
       } catch(err) { showToast('❌ 파일 읽기 실패: ' + err.message, 4000); console.error(err); }
     };
