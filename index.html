@@ -1804,34 +1804,52 @@ function loadRevExcel(input) {
         shopProducts = {};
         if (wb.Sheets['SHOP']) {
           const shopRows = XLSX.utils.sheet_to_json(wb.Sheets['SHOP'], { header: 1, defval: null });
-          // Row 0: empty, Row 1: headers (Index_A=col0, Name=col1, Cost1_DEV=col6), Row 2: empty, Row 3+: data
+          console.log('SHOP total rows:', shopRows.length);
+          console.log('SHOP row[0]:', JSON.stringify(shopRows[0]?.slice(0,8)));
+          console.log('SHOP row[1]:', JSON.stringify(shopRows[1]?.slice(0,8)));
+          console.log('SHOP row[2]:', JSON.stringify(shopRows[2]?.slice(0,8)));
+          console.log('SHOP row[3]:', JSON.stringify(shopRows[3]?.slice(0,8)));
+          console.log('SHOP row[4]:', JSON.stringify(shopRows[4]?.slice(0,8)));
           for (let i = 0; i < shopRows.length; i++) {
             const r = shopRows[i];
-            if (r[0] == null || typeof r[0] !== 'number') continue; // skip non-data rows
+            if (r[0] == null || typeof r[0] !== 'number') continue;
             const idx   = Math.round(r[0]);
             const name  = r[1] || '';
-            const cost1 = r[6]; // '현금' or '인게임재화' or '무료 상품'
+            const cost1 = r[6];
             if (cost1 === '현금') shopProducts[idx] = name;
           }
+          console.log('shopProducts count:', Object.keys(shopProducts).length);
+          console.log('shopProducts sample:', JSON.stringify(Object.entries(shopProducts).slice(0,3)));
         }
 
         // ── 3. TotalData 시트 ───────────────
         salesData = [];
         if (wb.Sheets['TotalData']) {
           const tdRows = XLSX.utils.sheet_to_json(wb.Sheets['TotalData'], { header: 1, defval: null });
-          // Col A(0)=None, B(1)=result, C(2)=table, D(3)=_start, E(4)=_stop, F(5)=total_count, G(6)=_measurement, H(7)=platform
+          console.log('TotalData total rows:', tdRows.length);
+          console.log('TotalData row[0]:', JSON.stringify(tdRows[0]));
+          console.log('TotalData row[1]:', JSON.stringify(tdRows[1]));
+          console.log('TotalData row[2]:', JSON.stringify(tdRows[2]));
+          // test first data row
+          const tr = tdRows[1];
+          console.log('TotalData row[1] analysis: r[3]=', tr?.[3], 'r[5]=', tr?.[5], 'r[6]=', tr?.[6], 'r[7]=', tr?.[7]);
+          console.log('  typeof r[3]:', typeof tr?.[3], '  typeof r[6]:', typeof tr?.[6]);
+          const testId = tr?.[6] != null ? Math.round(tr[6]) : null;
+          console.log('  testId:', testId, '  shopProducts[testId]:', shopProducts[testId]);
           for (let i = 1; i < tdRows.length; i++) {
             const r = tdRows[i];
-            const startRaw = r[3]; // '2026-03-23T00:00:00Z'
-            if (!startRaw || typeof startRaw !== 'string') continue;
-            const date      = startRaw.slice(0, 10);
+            const startRaw = r[3];
+            if (!startRaw) continue;
+            const date      = String(startRaw).slice(0, 10);
             const count     = parseFloat(r[5]) || 0;
             const productId = r[6] != null ? Math.round(r[6]) : null;
             const platform  = r[7] || '';
             if (productId == null) continue;
-            if (!shopProducts[productId]) continue; // cash only
+            if (!shopProducts[productId]) continue;
             salesData.push({ date, productId, count, platform });
           }
+          console.log('salesData count:', salesData.length);
+          console.log('salesData sample:', JSON.stringify(salesData.slice(0,3)));
         }
 
         if (!revData.length) { showToast('❌ 데이터를 읽을 수 없습니다', 3000); return; }
