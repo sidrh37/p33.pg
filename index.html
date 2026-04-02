@@ -449,6 +449,74 @@ body {
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 ::-webkit-scrollbar-track { background:transparent; }
 
+
+/* ── WIREFRAME TAB ───────────────────── */
+#wfTab { display:none; flex:1; flex-direction:column; overflow:hidden; }
+#wf-topbar { display:flex; align-items:center; gap:0; height:38px; background:#111116; border-bottom:1px solid #2a2a32; flex-shrink:0; }
+#wf-logo { padding:0 14px; font-size:11px; font-weight:600; color:#555; letter-spacing:.08em; border-right:1px solid #2a2a32; height:100%; display:flex; align-items:center; white-space:nowrap; }
+#wf-toolbar { display:flex; align-items:center; gap:4px; padding:0 10px; flex:1; flex-wrap:nowrap; overflow:hidden; }
+.wf-sep { width:1px; height:16px; background:#2a2a32; margin:0 4px; flex-shrink:0; }
+.wf-tb-btn { padding:3px 9px; border-radius:5px; border:1px solid #2a2a32; background:transparent; font-size:11px; cursor:pointer; color:#aaa; transition:all .15s; white-space:nowrap; flex-shrink:0; font-family:'Noto Sans KR',sans-serif; }
+.wf-tb-btn:hover { background:#232328; color:#e0ddd6; border-color:#3a3a44; }
+.wf-preset-group { display:flex; gap:3px; align-items:center; flex-shrink:0; }
+.wf-preset-label { font-size:10px; color:#555; margin-right:2px; }
+#wf-canvas-size-label { font-size:11px; color:#555; margin-left:auto; padding-right:12px; white-space:nowrap; }
+#wf-layout { display:flex; flex:1; overflow:hidden; }
+#wf-sidebar { width:172px; background:#13131a; border-right:1px solid #2a2a32; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden; }
+#wf-sidebar-header { padding:8px 12px; border-bottom:1px solid #2a2a32; font-size:9px; font-weight:600; color:#555; letter-spacing:.1em; text-transform:uppercase; }
+#wf-components { flex:1; overflow-y:auto; padding:6px 5px; }
+#wf-components::-webkit-scrollbar { width:3px; }
+#wf-components::-webkit-scrollbar-thumb { background:#2a2a32; border-radius:2px; }
+.wf-comp-group { margin-bottom:12px; }
+.wf-comp-group-label { font-size:9px; font-weight:600; color:#444; padding:0 6px 4px; text-transform:uppercase; letter-spacing:.08em; }
+.wf-comp-item { padding:4px 7px; border-radius:5px; border:1px solid #2a2a32; margin-bottom:2px; cursor:grab; font-size:11px; color:#999; background:#1a1a22; display:flex; align-items:center; gap:6px; user-select:none; transition:all .12s; }
+.wf-comp-item:hover { background:#22222c; color:#e0ddd6; border-color:#3a3a44; }
+.wf-comp-item:active { cursor:grabbing; transform:scale(.97); }
+.wf-comp-icon { width:15px; height:15px; flex-shrink:0; opacity:.7; }
+#wf-layers { border-top:1px solid #2a2a32; max-height:170px; display:flex; flex-direction:column; }
+#wf-layers-header { padding:7px 12px; font-size:9px; font-weight:600; color:#444; text-transform:uppercase; letter-spacing:.08em; border-bottom:1px solid #2a2a32; flex-shrink:0; }
+#wf-layers-list { overflow-y:auto; flex:1; }
+#wf-layers-list::-webkit-scrollbar { width:3px; }
+#wf-layers-list::-webkit-scrollbar-thumb { background:#2a2a32; border-radius:2px; }
+.wf-layer-item { padding:5px 10px; font-size:11px; color:#666; cursor:pointer; display:flex; align-items:center; gap:7px; border-bottom:1px solid #1e1e26; }
+.wf-layer-item:hover { background:#1e1e28; color:#bbb; }
+.wf-layer-item.selected { background:#1e2436; color:#7eb8f7; }
+.wf-layer-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.wf-layer-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#wf-main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+#wf-canvas-wrap { flex:1; overflow:auto; background:#0f0f14; position:relative; }
+#wf-canvas-wrap::-webkit-scrollbar { width:8px; height:8px; }
+#wf-canvas-wrap::-webkit-scrollbar-thumb { background:#2a2a32; border-radius:4px; }
+#wf-canvas-area { display:flex; align-items:flex-start; justify-content:flex-start; padding:24px; min-width:100%; min-height:100%; }
+#wf-canvas { position:relative; background:#fff; flex-shrink:0; cursor:default; }
+.wf-grid-overlay { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(100,100,120,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(100,100,120,.07) 1px,transparent 1px); background-size:20px 20px; }
+.wf-el { position:absolute; cursor:move; user-select:none; }
+.wf-el-outline { position:absolute; inset:-1px; border:1.5px dashed transparent; border-radius:3px; pointer-events:none; transition:opacity .1s; }
+.wf-el:hover .wf-el-outline { border-color:#4a9adf; opacity:.5; }
+.wf-el.selected .wf-el-outline { border-color:#4a9adf; opacity:1; border-style:solid; }
+.wf-resize-handle { position:absolute; width:8px; height:8px; background:#4a9adf; border:1.5px solid #fff; border-radius:2px; right:-4px; bottom:-4px; cursor:se-resize; display:none; z-index:10; }
+.wf-el.selected .wf-resize-handle { display:block; }
+.wf-el-label { position:absolute; top:-18px; left:0; font-size:9px; color:#4a9adf; white-space:nowrap; opacity:0; pointer-events:none; background:#1a2a3a; padding:1px 5px; border-radius:3px; }
+.wf-el.selected .wf-el-label { opacity:1; }
+#wf-props { width:176px; background:#13131a; border-left:1px solid #2a2a32; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden; }
+#wf-props-header { padding:8px 12px; border-bottom:1px solid #2a2a32; font-size:9px; font-weight:600; color:#555; letter-spacing:.1em; text-transform:uppercase; }
+#wf-props-body { flex:1; overflow-y:auto; padding:12px; }
+#wf-props-body::-webkit-scrollbar { width:3px; }
+#wf-props-body::-webkit-scrollbar-thumb { background:#2a2a32; border-radius:2px; }
+.wf-prop-row { margin-bottom:11px; }
+.wf-prop-label { font-size:10px; color:#555; margin-bottom:4px; }
+.wf-prop-input { width:100%; padding:5px 8px; border-radius:5px; border:1px solid #2a2a32; font-size:11px; background:#1a1a22; color:#e0ddd6; outline:none; transition:border .15s; font-family:'Noto Sans KR',sans-serif; }
+.wf-prop-input:focus { border-color:#3a5a8a; }
+.wf-prop-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.wf-prop-row-2 .wf-prop-input { padding:5px 6px; }
+#wf-no-sel { font-size:12px; color:#444; padding-top:4px; line-height:1.7; }
+.wf-prop-divider { height:1px; background:#2a2a32; margin:12px 0; }
+.wf-prop-type-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; background:#1e2436; color:#4a9adf; border:1px solid #1e3a5a; margin-bottom:12px; }
+.wf-del-btn { width:100%; padding:6px; border-radius:5px; border:1px solid #3a2222; background:transparent; font-size:11px; cursor:pointer; color:#a06060; transition:all .15s; margin-top:4px; font-family:'Noto Sans KR',sans-serif; }
+.wf-del-btn:hover { background:#2a1818; border-color:#6a3030; color:#d07070; }
+#wf-statusbar { height:24px; background:#111116; border-top:1px solid #2a2a32; display:flex; align-items:center; padding:0 12px; gap:16px; flex-shrink:0; }
+#wf-statusbar span { font-size:10px; color:#444; }
+
 /* ── TAB NAV ─────────────────────────── */
 .tab-nav {
   display:flex; align-items:center; gap:2px;
@@ -649,6 +717,9 @@ body {
   </button>
   <button class="tab-btn" id="tabBtnRevenue" onclick="switchTab('revenue')">
     <span class="tab-icon">📊</span> 매출
+  </button>
+  <button class="tab-btn" id="tabBtnWf" onclick="switchTab('wf')">
+    <span class="tab-icon">🖼</span> 와이어프레임
   </button>
 
   <!-- cal controls live here, hidden when on other tabs -->
@@ -1589,10 +1660,12 @@ function switchTab(tab) {
   document.getElementById('calTab').style.display      = tab==='cal'     ? 'flex' : 'none';
   document.getElementById('memoTab').style.display     = tab==='memo'    ? 'flex' : 'none';
   document.getElementById('revenueTab').style.display  = tab==='revenue' ? 'flex' : 'none';
+  document.getElementById('wfTab').style.display       = tab==='wf'      ? 'flex' : 'none';
   document.getElementById('calControls').style.display = tab==='cal'     ? 'flex' : 'none';
   document.getElementById('tabBtnCal').classList.toggle('active',     tab==='cal');
   document.getElementById('tabBtnMemo').classList.toggle('active',    tab==='memo');
   document.getElementById('tabBtnRevenue').classList.toggle('active', tab==='revenue');
+  document.getElementById('tabBtnWf').classList.toggle('active',      tab==='wf');
   if (tab==='memo') syncMemos();
 }
 
@@ -1745,6 +1818,54 @@ async function removeImage(idx) {
 }
 function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// ── 클립보드 붙여넣기 (메모 + 와이어프레임) ──
+document.addEventListener('paste', async e => {
+  const items = Array.from(e.clipboardData?.items || []);
+  const imgItem = items.find(i => i.type.startsWith('image/'));
+  if (!imgItem) return;
+
+  const memoOpen   = document.getElementById('memoOverlay')?.classList.contains('open');
+  const memoActive = document.getElementById('memoTab')?.style.display !== 'none';
+  const wfActive   = document.getElementById('wfTab')?.style.display !== 'none';
+
+  if (memoOpen || memoActive) {
+    // 메모 탭: 현재 열린 메모에 이미지 추가
+    if (!curMemoId) { showToast('메모를 먼저 열어주세요'); return; }
+    e.preventDefault();
+    const file = imgItem.getAsFile();
+    showToast('클립보드 이미지 업로드 중...');
+    try {
+      const url = await uploadImage(file);
+      const m = memos.find(x => x.id === curMemoId); if (!m) return;
+      if (!m.images) m.images = [];
+      m.images.push(url); m.updatedAt = Date.now();
+      await saveMemoToDB(m);
+      renderMemoImages(m.images); renderMemoGrid();
+      showToast('✓ 클립보드 이미지 첨부됨');
+    } catch(err) { showToast('이미지 업로드 실패: ' + err.message, 3000); }
+
+  } else if (wfActive) {
+    // 와이어프레임 탭: 이미지를 캔버스 중앙에 배치
+    e.preventDefault();
+    const file = imgItem.getAsFile();
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const src = ev.target.result;
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 300, maxH = 300;
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        // wfIdCnt is inside the IIFE closure — use a custom event to communicate
+        document.dispatchEvent(new CustomEvent('wf-paste-image', { detail: { src, w, h } }));
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
 // ══════════════════════════════════════
 // REVENUE TAB
@@ -2059,6 +2180,312 @@ setMemoSize(savedSize);
   const loggedIn = await initAuth();
   if (loggedIn) syncAll();
 })();
+
+// ══════════════════════════════════════
+// WIREFRAME TAB
+// ══════════════════════════════════════
+(function(){
+const wfCanvas = document.getElementById('wf-canvas');
+let wfEls = [], wfSelected = null, wfIdCnt = 0;
+let wfW = 390, wfH = 844, wfGridOn = false;
+
+const wfCfg = {
+  rect:      {w:120,h:60,  label:'사각형',    fill:'#c8c4bc',stroke:'#6a6860'},
+  text:      {w:120,h:32,  label:'텍스트',    fill:'none',   stroke:'#6a6860'},
+  image:     {w:140,h:100, label:'이미지',    fill:'#d0ccC4',stroke:'#6a6860'},
+  btn:       {w:110,h:38,  label:'버튼',      fill:'#c8c4bc',stroke:'#6a6860'},
+  icon:      {w:40, h:40,  label:'아이콘',    fill:'#c8c4bc',stroke:'#6a6860'},
+  hp:        {w:180,h:22,  label:'HP',        fill:'none',   stroke:'#8a4a4a'},
+  mp:        {w:180,h:22,  label:'MP',        fill:'none',   stroke:'#4a6a8a'},
+  gauge:     {w:90, h:70,  label:'게이지',    fill:'none',   stroke:'#7a7a4a'},
+  minimap:   {w:110,h:110, label:'미니맵',    fill:'#c8c4bc',stroke:'#6a6860'},
+  skill:     {w:152,h:38,  label:'스킬',      fill:'#c8c4bc',stroke:'#6a6860'},
+  portrait:  {w:80, h:80,  label:'초상',      fill:'#c8c4bc',stroke:'#6a6860'},
+  inventory: {w:220,h:190, label:'인벤토리',  fill:'#c8c4bc',stroke:'#6a6860'},
+  dialog:    {w:300,h:84,  label:'대화창',    fill:'#e8e4da',stroke:'#6a6860'},
+  quest:     {w:170,h:130, label:'퀘스트',    fill:'#e8e4da',stroke:'#6a6860'},
+  buff:      {w:110,h:36,  label:'버프',      fill:'#c8c4bc',stroke:'#6a6860'},
+  shop:      {w:260,h:200, label:'상점',      fill:'#e8e4da',stroke:'#6a6860'},
+  hud:       {w:390,h:56,  label:'HUD 프레임',fill:'#c8c4bc',stroke:'#6a6860'},
+  popup:     {w:260,h:200, label:'팝업',      fill:'#e8e4da',stroke:'#6a6860'},
+  scrolllist:{w:160,h:200, label:'리스트',    fill:'#e8e4da',stroke:'#6a6860'},
+  tab:       {w:200,h:160, label:'탭 UI',     fill:'#e8e4da',stroke:'#6a6860'},
+};
+
+window.wfSetPreset = function(w,h){ wfW=w; wfH=h; document.getElementById('wf-canvas-size-label').textContent=w+' \xd7 '+h; wfCanvas.style.width=w+'px'; wfCanvas.style.height=h+'px'; };
+window.wfToggleGrid = function(){ wfGridOn=!wfGridOn; document.getElementById('wf-grid-overlay').style.display=wfGridOn?'block':'none'; document.getElementById('wf-grid-btn').textContent='\uadf8\ub9ac\ub4dc '+(wfGridOn?'OFF':'ON'); };
+window.wfClearAll = function(){ if(!confirm('\ubaa8\ub4e0 \uc694\uc18c\ub97c \uc0ad\uc81c\ud560\uae4c\uc694?')) return; wfEls.forEach(e=>document.getElementById('wf-el-'+e.id)?.remove()); wfEls=[]; wfSelected=null; document.getElementById('wf-no-sel').style.display=''; document.getElementById('wf-sel-props').style.display='none'; wfUpdateLayers(); wfUpdateStatus(); };
+window.wfDeleteSelected = function(){ if(!wfSelected) return; document.getElementById('wf-el-'+wfSelected)?.remove(); wfEls=wfEls.filter(x=>x.id!==wfSelected); wfSelected=null; document.getElementById('wf-no-sel').style.display=''; document.getElementById('wf-sel-props').style.display='none'; document.getElementById('wf-status-sel').textContent='\uc120\ud0dd \uc5c6\uc74c'; wfUpdateLayers(); wfUpdateStatus(); };
+
+wfCanvas.style.width=wfW+'px'; wfCanvas.style.height=wfH+'px';
+
+function wfSvg(w,h,inner){ return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;overflow:visible">'+inner+'</svg>'; }
+
+function wfShape(el){
+  const t=el.type,w=el.w,h=el.h,lb=el.label,fi=el.fill,st=el.stroke,sw=1.2,mx=w/2,my=h/2,fs=Math.min(12,Math.max(9,w/14));
+  const txt='<text x="'+mx+'" y="'+(my+fs*.35)+'" text-anchor="middle" font-size="'+fs+'" fill="'+st+'" font-family="system-ui,sans-serif" opacity=".8">'+lb+'</text>';
+  if(t==='rect') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="4" fill="'+fi+'" fill-opacity=".35" stroke="'+st+'" stroke-width="'+sw+'"/>'+txt);
+  if(t==='text'){ let l=''; for(let i=0;i<4;i++) l+='<rect x="0" y="'+(i*7+2)+'" width="'+(w*[.6,.9,.75,.5][i%4])+'" height="3" rx="1" fill="'+st+'" opacity=".2"/>'; return wfSvg(w,h,l+'<text x="0" y="'+(h/2+fs*.35)+'" font-size="'+fs+'" fill="'+st+'" font-family="system-ui,sans-serif" opacity=".6">'+lb+'</text>'); }
+  if(t==='image') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="4" fill="'+fi+'" fill-opacity=".35" stroke="'+st+'" stroke-width="'+sw+'"/><line x1="0" y1="'+h+'" x2="'+w+'" y2="0" stroke="'+st+'" stroke-width=".7" opacity=".2"/><line x1="0" y1="0" x2="'+w+'" y2="'+h+'" stroke="'+st+'" stroke-width=".7" opacity=".2"/>'+txt);
+  if(t==='btn') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="'+(h/2)+'" fill="'+fi+'" fill-opacity=".4" stroke="'+st+'" stroke-width="'+sw+'"/>'+txt);
+  if(t==='icon') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="6" fill="'+fi+'" fill-opacity=".35" stroke="'+st+'" stroke-width="'+sw+'"/><circle cx="'+mx+'" cy="'+my+'" r="'+(Math.min(w,h)*.28)+'" fill="'+st+'" opacity=".2"/>');
+  if(t==='hp'){ const bh=Math.max(8,h-2); return wfSvg(w,h,'<rect x=".6" y="'+((h-bh)/2)+'" width="'+(w-1.2)+'" height="'+bh+'" rx="'+(bh/2)+'" fill="none" stroke="'+st+'" stroke-width="1.2"/><rect x=".6" y="'+((h-bh)/2)+'" width="'+((w-1.2)*.7)+'" height="'+bh+'" rx="'+(bh/2)+'" fill="'+st+'" fill-opacity=".35"/><text x="6" y="'+(my+4)+'" font-size="9" fill="'+st+'" font-family="system-ui,sans-serif">HP 70%</text>'); }
+  if(t==='mp'){ const bh=Math.max(8,h-2); return wfSvg(w,h,'<rect x=".6" y="'+((h-bh)/2)+'" width="'+(w-1.2)+'" height="'+bh+'" rx="'+(bh/2)+'" fill="none" stroke="'+st+'" stroke-width="1.2"/><rect x=".6" y="'+((h-bh)/2)+'" width="'+((w-1.2)*.45)+'" height="'+bh+'" rx="'+(bh/2)+'" fill="'+st+'" fill-opacity=".35"/><text x="6" y="'+(my+4)+'" font-size="9" fill="'+st+'" font-family="system-ui,sans-serif">MP 45%</text>'); }
+  if(t==='gauge'){ const cx=mx,cy=h*.82,r=Math.min(w,h)*.6; return wfSvg(w,h,'<path d="M'+(cx-r)+','+cy+' A'+r+','+r+' 0 0,1 '+(cx+r)+','+cy+'" fill="none" stroke="'+st+'" stroke-width="3.5" opacity=".2"/><path d="M'+(cx-r)+','+cy+' A'+r+','+r+' 0 0,1 '+(cx+r*.3)+','+(cy-r*.95)+'" fill="none" stroke="'+st+'" stroke-width="3.5" opacity=".55"/><text x="'+cx+'" y="'+(cy-5)+'" text-anchor="middle" font-size="11" fill="'+st+'" font-family="system-ui,sans-serif">75%</text>'); }
+  if(t==='minimap') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="4" fill="'+fi+'" fill-opacity=".3" stroke="'+st+'" stroke-width="'+sw+'"/><rect x="6" y="6" width="'+(w*.35)+'" height="'+(h*.28)+'" rx="2" fill="'+st+'" opacity=".18"/><circle cx="'+mx+'" cy="'+my+'" r="4" fill="'+st+'" opacity=".6"/><text x="'+mx+'" y="'+(h-5)+'" text-anchor="middle" font-size="9" fill="'+st+'" font-family="system-ui,sans-serif">\ub2c8\ub9f5</text>');
+  if(t==='skill'){ const slots=4,sz=Math.min(w/slots-6,h-6),gap=(w-slots*sz)/(slots+1); let b=''; for(let i=0;i<slots;i++){const bx=gap+i*(sz+gap),by=(h-sz)/2;b+='<rect x="'+bx+'" y="'+by+'" width="'+sz+'" height="'+sz+'" rx="4" fill="'+fi+'" fill-opacity=".35" stroke="'+st+'" stroke-width="1"/>';}return wfSvg(w,h,b);}
+  if(t==='portrait') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="5" fill="'+fi+'" fill-opacity=".38" stroke="'+st+'" stroke-width="'+sw+'"/><circle cx="'+mx+'" cy="'+(h*.38)+'" r="'+(w*.22)+'" fill="none" stroke="'+st+'" stroke-width="1.2"/><path d="M'+(w*.12)+','+(h-2)+' Q'+mx+','+(h*.58)+' '+(w*.88)+','+(h-2)+'" fill="none" stroke="'+st+'" stroke-width="1.2"/>');
+  if(t==='inventory'){ const cols=4,rows=3,cell=Math.min((w-8)/cols,(h-30)/rows),ox=(w-cols*cell)/2,oy=24;let c='';for(let r=0;r<rows;r++)for(let cc=0;cc<cols;cc++)c+='<rect x="'+(ox+cc*cell+1)+'" y="'+(oy+r*cell+1)+'" width="'+(cell-4)+'" height="'+(cell-4)+'" rx="3" fill="'+fi+'" fill-opacity=".3" stroke="'+st+'" stroke-width=".8"/>';return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="4" fill="none" stroke="'+st+'" stroke-width="'+sw+'"/><rect x=".6" y=".6" width="'+(w-1.2)+'" height="20" rx="4" fill="'+st+'" fill-opacity=".12"/><text x="'+mx+'" y="14" text-anchor="middle" font-size="10" fill="'+st+'" font-family="system-ui,sans-serif">\uc778\ubca4\ud1a0\ub9ac</text>'+c);}
+  if(t==='dialog') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="6" fill="'+fi+'" fill-opacity=".5" stroke="'+st+'" stroke-width="'+sw+'"/><rect x="8" y="'+(h*.25)+'" width="'+(w*.5)+'" height="5" rx="2" fill="'+st+'" opacity=".3"/><rect x="8" y="'+(h*.48)+'" width="'+(w*.75)+'" height="4" rx="2" fill="'+st+'" opacity=".2"/><path d="M'+(w*.18)+','+(h-1)+' L'+(w*.18)+','+(h+7)+' L'+(w*.32)+','+(h-1)+'" fill="'+fi+'" fill-opacity=".7" stroke="'+st+'" stroke-width=".8"/>');
+  if(t==='quest') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="5" fill="'+fi+'" fill-opacity=".5" stroke="'+st+'" stroke-width="'+sw+'"/><text x="'+mx+'" y="15" text-anchor="middle" font-size="10" fill="'+st+'" font-family="system-ui,sans-serif">\ud018\uc2a4\ud2b8</text>'+[28,44,60,76].map((y,i)=>'<rect x="10" y="'+y+'" width="7" height="7" rx="1.5" fill="'+(i===1?st:'none')+'" stroke="'+st+'" stroke-width=".9"/><rect x="22" y="'+(y+1)+'" width="'+((w-32)*(i===2?.7:i===3?.55:.85))+'" height="4" rx="2" fill="'+st+'" opacity=".2"/>').join(''));
+  if(t==='buff'){ const sz=h-4,n=3,gap=(w-n*sz)/(n+1);let b='';for(let i=0;i<n;i++) b+='<rect x="'+(gap+i*(sz+gap))+'" y="2" width="'+sz+'" height="'+sz+'" rx="3" fill="'+fi+'" fill-opacity=".35" stroke="'+st+'" stroke-width="1" opacity="'+(1-i*.2)+'"/>';return wfSvg(w,h,b);}
+  if(t==='shop') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="6" fill="'+fi+'" fill-opacity=".5" stroke="'+st+'" stroke-width="'+sw+'"/><text x="'+mx+'" y="17" text-anchor="middle" font-size="11" fill="'+st+'" font-family="system-ui,sans-serif">\uc0c1\uc810</text>');
+  if(t==='hud') return wfSvg(w,h,'<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="'+fi+'" fill-opacity=".18" stroke="'+st+'" stroke-width=".8"/><text x="'+mx+'" y="'+(my+4)+'" text-anchor="middle" font-size="11" fill="'+st+'" font-family="system-ui,sans-serif">HUD \ud504\ub808\uc784</text>');
+  if(t==='popup') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="10" fill="'+fi+'" fill-opacity=".6" stroke="'+st+'" stroke-width="'+sw+'"/><rect x=".6" y=".6" width="'+(w-1.2)+'" height="32" rx="10" fill="'+st+'" fill-opacity=".12"/><text x="'+mx+'" y="21" text-anchor="middle" font-size="11" fill="'+st+'" font-family="system-ui,sans-serif">'+lb+'</text><rect x="'+(w*.22)+'" y="'+(h-34)+'" width="'+(w*.24)+'" height="22" rx="5" fill="none" stroke="'+st+'" stroke-width="1"/><rect x="'+(w*.54)+'" y="'+(h-34)+'" width="'+(w*.24)+'" height="22" rx="5" fill="'+st+'" fill-opacity=".25" stroke="'+st+'" stroke-width="1"/>');
+  if(t==='scrolllist') return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="5" fill="'+fi+'" fill-opacity=".4" stroke="'+st+'" stroke-width="'+sw+'"/>'+Array.from({length:6},(_,i)=>'<rect x="6" y="'+(28+i*26)+'" width="'+(w-28)+'" height="20" rx="3" fill="'+fi+'" fill-opacity=".4" stroke="'+st+'" stroke-width=".7"/>').join('')+'<rect x="'+(w-10)+'" y="28" width="5" height="'+(Math.max(30,(h-34)*.4))+'" rx="2.5" fill="'+st+'" opacity=".25"/>');
+  if(t==='tab') return wfSvg(w,h,'<rect x=".6" y="28" width="'+(w-1.2)+'" height="'+(h-28.6)+'" rx="5" fill="'+fi+'" fill-opacity=".4" stroke="'+st+'" stroke-width="'+sw+'"/><rect x=".6" y="14" width="'+(w*.35)+'" height="18" rx="4" fill="'+fi+'" fill-opacity=".6" stroke="'+st+'" stroke-width="1"/><text x="'+(w*.17)+'" y="24" text-anchor="middle" font-size="9" fill="'+st+'" font-family="system-ui,sans-serif">\ud0ed1</text>');
+  return wfSvg(w,h,'<rect x=".6" y=".6" width="'+(w-1.2)+'" height="'+(h-1.2)+'" rx="4" fill="'+fi+'" fill-opacity=".3" stroke="'+st+'" stroke-width="'+sw+'"/>'+txt);
+}
+
+function wfRenderEl(el){
+  let div=document.getElementById('wf-el-'+el.id);
+  if(!div){ div=document.createElement('div'); div.id='wf-el-'+el.id; div.className='wf-el'; wfCanvas.appendChild(div); div.addEventListener('mousedown',e=>wfOnElDown(e,el.id)); }
+  div.style.cssText='position:absolute;left:'+el.x+'px;top:'+el.y+'px;width:'+el.w+'px;height:'+el.h+'px;opacity:'+el.opacity+';cursor:move;user-select:none';
+  div.innerHTML='<div class="wf-el-outline"></div><span class="wf-el-label">'+el.name+'</span>'+wfShape(el)+'<div class="wf-resize-handle" id="wf-rh-'+el.id+'"></div>';
+  div.querySelector('.wf-resize-handle').addEventListener('mousedown',e=>wfOnResizeDown(e,el.id));
+  if(wfSelected===el.id) div.classList.add('selected');
+}
+
+function wfOnElDown(e,id){
+  if(e.target.classList.contains('wf-resize-handle')) return;
+  e.stopPropagation(); wfSelectEl(id);
+  const el=wfEls.find(x=>x.id===id),sx=e.clientX,sy=e.clientY,ox=el.x,oy=el.y;
+  const mv=ev=>{el.x=Math.round(ox+(ev.clientX-sx));el.y=Math.round(oy+(ev.clientY-sy));const d=document.getElementById('wf-el-'+id);if(d){d.style.left=el.x+'px';d.style.top=el.y+'px';}wfUpdatePropsPanel();document.getElementById('wf-status-pos').textContent='x: '+el.x+'  y: '+el.y;};
+  const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+function wfOnResizeDown(e,id){
+  e.stopPropagation();e.preventDefault();
+  const el=wfEls.find(x=>x.id===id),sx=e.clientX,sy=e.clientY,ow=el.w,oh=el.h;
+  const mv=ev=>{el.w=Math.max(20,Math.round(ow+(ev.clientX-sx)));el.h=Math.max(14,Math.round(oh+(ev.clientY-sy)));wfRenderEl(el);wfUpdatePropsPanel();};
+  const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+}
+wfCanvas.addEventListener('mousedown',e=>{if(e.target===wfCanvas||e.target.id==='wf-grid-overlay') wfSelectEl(null);});
+wfCanvas.addEventListener('mousemove',e=>{const r=wfCanvas.getBoundingClientRect();document.getElementById('wf-status-pos').textContent='x: '+Math.round(e.clientX-r.left)+'  y: '+Math.round(e.clientY-r.top);});
+document.querySelectorAll('.wf-comp-item').forEach(item=>{item.addEventListener('dragstart',e=>e.dataTransfer.setData('wftype',item.dataset.wftype));});
+wfCanvas.addEventListener('dragover',e=>e.preventDefault());
+wfCanvas.addEventListener('drop',e=>{
+  e.preventDefault();const type=e.dataTransfer.getData('wftype');if(!type) return;
+  const r=wfCanvas.getBoundingClientRect(),cfg=wfCfg[type]||wfCfg.rect;
+  const el={id:++wfIdCnt,type,x:Math.round(e.clientX-r.left-cfg.w/2),y:Math.round(e.clientY-r.top-cfg.h/2),w:cfg.w,h:cfg.h,label:cfg.label,fill:cfg.fill,stroke:cfg.stroke,opacity:1,name:cfg.label+' '+wfIdCnt};
+  wfEls.push(el);wfRenderEl(el);wfUpdateLayers();wfSelectEl(el.id);wfUpdateStatus();
+});
+function wfSelectEl(id){
+  wfSelected=id;
+  document.querySelectorAll('.wf-el').forEach(d=>d.classList.remove('selected'));
+  document.querySelectorAll('.wf-layer-item').forEach(d=>d.classList.remove('selected'));
+  if(id){
+    document.getElementById('wf-el-'+id)?.classList.add('selected');
+    document.getElementById('wf-li-'+id)?.classList.add('selected');
+    document.getElementById('wf-no-sel').style.display='none';
+    document.getElementById('wf-sel-props').style.display='';
+    wfUpdatePropsPanel();
+    const el=wfEls.find(x=>x.id===id);
+    document.getElementById('wf-status-sel').textContent=el?el.name:'\uc120\ud0dd \uc5c6\uc74c';
+  } else {
+    document.getElementById('wf-no-sel').style.display='';
+    document.getElementById('wf-sel-props').style.display='none';
+    document.getElementById('wf-status-sel').textContent='\uc120\ud0dd \uc5c6\uc74c';
+  }
+}
+function wfUpdatePropsPanel(){
+  const el=wfEls.find(x=>x.id===wfSelected);if(!el) return;
+  document.getElementById('wf-prop-type-badge').textContent=el.type;
+  document.getElementById('wf-prop-name').value=el.name;
+  document.getElementById('wf-prop-x').value=el.x;
+  document.getElementById('wf-prop-y').value=el.y;
+  document.getElementById('wf-prop-w').value=el.w;
+  document.getElementById('wf-prop-h').value=el.h;
+  document.getElementById('wf-prop-label').value=el.label;
+  document.getElementById('wf-prop-opacity').value=Math.round(el.opacity*100);
+  document.getElementById('wf-prop-opacity-val').textContent=Math.round(el.opacity*100)+'%';
+}
+window.wfUpdateProp=function(key,val){
+  const el=wfEls.find(x=>x.id===wfSelected);if(!el) return;
+  if(key==='x') el.x=val; else if(key==='y') el.y=val;
+  else if(key==='w') el.w=Math.max(20,val); else if(key==='h') el.h=Math.max(14,val);
+  else if(key==='label') el.label=val; else if(key==='name') el.name=val;
+  else if(key==='opacity') el.opacity=val;
+  wfRenderEl(el);wfUpdateLayers();
+};
+function wfUpdateLayers(){
+  const list=document.getElementById('wf-layers-list');list.innerHTML='';
+  const colors={hp:'#a05050',mp:'#4a7aa0',gauge:'#a0a040',minimap:'#40a070',quest:'#a08040',dialog:'#408080',default:'#707070'};
+  [...wfEls].reverse().forEach(el=>{
+    const d=document.createElement('div');d.className='wf-layer-item'+(wfSelected===el.id?' selected':'');d.id='wf-li-'+el.id;
+    d.innerHTML='<span class="wf-layer-dot" style="background:'+(colors[el.type]||colors.default)+'"></span><span class="wf-layer-name">'+el.name+'</span>';
+    d.onclick=()=>wfSelectEl(el.id);list.appendChild(d);
+  });
+}
+function wfUpdateStatus(){ document.getElementById('wf-status-count').textContent='\uc694\uc18c '+wfEls.length+'\uac1c'; }
+window.wfExportSVG=function(){
+  const inner=wfEls.map(el=>{const c=wfShape(el).replace(/<svg[^>]*>([\s\S]*?)<\/svg>/,'$1');return '<g transform="translate('+el.x+','+el.y+')" opacity="'+el.opacity+'">'+c+'</g>';}).join('\n');
+  const out='<svg width="'+wfW+'" height="'+wfH+'" viewBox="0 0 '+wfW+' '+wfH+'" xmlns="http://www.w3.org/2000/svg">\n<rect width="'+wfW+'" height="'+wfH+'" fill="white"/>\n'+inner+'\n</svg>';
+  const a=document.createElement('a');a.href='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(out);a.download='wireframe.svg';a.click();
+};
+window.wfExportPNG=function(){
+  const inner=wfEls.map(el=>{const c=wfShape(el).replace(/<svg[^>]*>([\s\S]*?)<\/svg>/,'$1');return '<g transform="translate('+el.x+','+el.y+')" opacity="'+el.opacity+'">'+c+'</g>';}).join('\n');
+  const svgStr='<svg width="'+wfW+'" height="'+wfH+'" viewBox="0 0 '+wfW+' '+wfH+'" xmlns="http://www.w3.org/2000/svg"><rect width="'+wfW+'" height="'+wfH+'" fill="white"/>'+inner+'</svg>';
+  const img=new Image(),blob=new Blob([svgStr],{type:'image/svg+xml'}),url=URL.createObjectURL(blob);
+  img.onload=()=>{const cv=document.createElement('canvas');cv.width=wfW;cv.height=wfH;cv.getContext('2d').drawImage(img,0,0);const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='wireframe.png';a.click();URL.revokeObjectURL(url);};
+  img.src=url;
+};
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('wfTab').style.display==='none') return;
+  if((e.key==='Delete'||e.key==='Backspace')&&wfSelected&&!['INPUT','TEXTAREA'].includes(e.target.tagName)){e.preventDefault();wfDeleteSelected();}
+  if(e.key==='Escape') wfSelectEl(null);
+  if(wfSelected&&e.key.startsWith('Arrow')){
+    e.preventDefault();const el=wfEls.find(x=>x.id===wfSelected);if(!el) return;
+    const d=e.shiftKey?10:1;
+    if(e.key==='ArrowLeft') el.x-=d;if(e.key==='ArrowRight') el.x+=d;
+    if(e.key==='ArrowUp') el.y-=d;if(e.key==='ArrowDown') el.y+=d;
+    const div=document.getElementById('wf-el-'+el.id);if(div){div.style.left=el.x+'px';div.style.top=el.y+'px';}
+    wfUpdatePropsPanel();
+  }
+});
+
+// 클립보드 이미지 → 캔버스 중앙에 image 엘리먼트로 추가
+document.addEventListener('wf-paste-image', ev => {
+  if(document.getElementById('wfTab').style.display==='none') return;
+  const {src, w, h} = ev.detail;
+  const wrap = document.getElementById('wf-canvas-wrap');
+  const cx = Math.round((wrap.scrollLeft + wrap.clientWidth/2) - w/2);
+  const cy = Math.round((wrap.scrollTop  + wrap.clientHeight/2) - h/2);
+  const el = {
+    id: ++wfIdCnt, type: 'image',
+    x: Math.max(0, cx), y: Math.max(0, cy), w, h,
+    label: '붙여넣기', fill: '#d0ccC4', stroke: '#6a6860',
+    opacity: 1, name: '이미지 ' + wfIdCnt,
+    _src: src   // store original src for rendering
+  };
+  // override shape for pasted images
+  el._customShape = '<img src="'+src+'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:3px;">';
+  wfEls.push(el);
+  // custom render for pasted images
+  let div = document.createElement('div');
+  div.id = 'wf-el-'+el.id; div.className = 'wf-el';
+  wfCanvas.appendChild(div);
+  div.addEventListener('mousedown', e => wfOnElDown(e, el.id));
+  div.style.cssText = 'position:absolute;left:'+el.x+'px;top:'+el.y+'px;width:'+el.w+'px;height:'+el.h+'px;opacity:1;cursor:move;user-select:none';
+  div.innerHTML = '<div class="wf-el-outline"></div><span class="wf-el-label">'+el.name+'</span>'+el._customShape+'<div class="wf-resize-handle" id="wf-rh-'+el.id+'"></div>';
+  div.querySelector('.wf-resize-handle').addEventListener('mousedown', e => wfOnResizeDown(e, el.id));
+  wfUpdateLayers(); wfSelectEl(el.id); wfUpdateStatus();
+  showToast('✓ 클립보드 이미지가 캔버스에 추가됐습니다');
+});
+})();
 </script>
+
+<!-- TAB: WIREFRAME -->
+<div id="wfTab">
+  <div id="wf-topbar">
+    <div id="wf-logo">WIREFRAME</div>
+    <div id="wf-toolbar">
+      <div class="wf-preset-group">
+        <span class="wf-preset-label">화면</span>
+        <button class="wf-tb-btn" onclick="wfSetPreset(390,844)">모바일</button>
+        <button class="wf-tb-btn" onclick="wfSetPreset(1280,720)">PC 720p</button>
+        <button class="wf-tb-btn" onclick="wfSetPreset(1920,1080)">FHD</button>
+        <button class="wf-tb-btn" onclick="wfSetPreset(2560,1440)">QHD</button>
+      </div>
+      <div class="wf-sep"></div>
+      <button class="wf-tb-btn" onclick="wfToggleGrid()" id="wf-grid-btn">그리드 ON</button>
+      <button class="wf-tb-btn" onclick="wfClearAll()">전체 지우기</button>
+      <button class="wf-tb-btn" onclick="wfExportSVG()">SVG 내보내기</button>
+      <button class="wf-tb-btn" onclick="wfExportPNG()">PNG 내보내기</button>
+    </div>
+    <span id="wf-canvas-size-label">390 × 844</span>
+  </div>
+  <div id="wf-layout">
+    <div id="wf-sidebar">
+      <div id="wf-sidebar-header">컴포넌트</div>
+      <div id="wf-components">
+        <div class="wf-comp-group">
+          <div class="wf-comp-group-label">기본</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="rect"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>사각형</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="text"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="currentColor"><text x="2" y="13" font-size="13" font-weight="bold">T</text></svg>텍스트</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="image"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="2" width="14" height="12" rx="1.5"/><polyline points="1,11 5,7 8,9.5 11,6 15,9"/></svg>이미지</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="btn"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="4" width="14" height="8" rx="3"/></svg>버튼</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="icon"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r=".8" fill="currentColor"/></svg>아이콘</div>
+        </div>
+        <div class="wf-comp-group">
+          <div class="wf-comp-group-label">게임 UI</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="hp"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="6" width="14" height="4" rx="1.5"/><rect x="1" y="6" width="9" height="4" rx="1.5" fill="currentColor" opacity=".3"/></svg>HP바</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="mp"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="6" width="14" height="4" rx="1.5"/><rect x="1" y="6" width="6" height="4" rx="1.5" fill="currentColor" opacity=".3"/></svg>MP바</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="gauge"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2,13 A7,7 0 0,1 14,13"/><path d="M2,13 A7,7 0 0,1 10,6.5" stroke-width="2" opacity=".5"/></svg>게이지</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="minimap"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="14" height="14" rx="1.5"/><rect x="3" y="3" width="5" height="4" rx="1" fill="currentColor" opacity=".25"/><circle cx="11" cy="10" r="2" fill="currentColor" opacity=".3"/></svg>미니맵</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="skill"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>스킬 슬롯</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="portrait"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="8" cy="6" r="2.5"/><path d="M2.5,15 Q8,10.5 13.5,15"/></svg>캐릭터 초상</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="inventory"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="3" width="14" height="12" rx="1.5"/><path d="M5.5,3 L5.5,1.5 L10.5,1.5 L10.5,3"/><rect x="3" y="6" width="4" height="4" rx="1"/><rect x="9" y="6" width="4" height="4" rx="1"/></svg>인벤토리</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="dialog"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="2" width="14" height="10" rx="1.5"/><path d="M4,12 L4,15 L9,12" fill="currentColor" opacity=".4"/></svg>대화창</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="quest"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="1" width="14" height="14" rx="1.5"/><line x1="4" y1="5" x2="12" y2="5"/><line x1="4" y1="8" x2="10" y2="8"/><line x1="4" y1="11" x2="11" y2="11"/></svg>퀘스트 로그</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="buff"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="5" width="4" height="4" rx="1"/><rect x="6.5" y="5" width="4" height="4" rx="1"/><rect x="12" y="5" width="4" height="4" rx="1" opacity=".4"/></svg>버프 아이콘</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="shop"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="5" width="14" height="10" rx="1.5"/><path d="M4,5 Q4,1 8,1 Q12,1 12,5"/></svg>상점 창</div>
+        </div>
+        <div class="wf-comp-group">
+          <div class="wf-comp-group-label">레이아웃</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="hud"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="1" width="14" height="3" rx=".5" fill="currentColor" opacity=".2"/><rect x="1" y="12" width="14" height="3" rx=".5" fill="currentColor" opacity=".2"/></svg>HUD 프레임</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="popup"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="12" height="10" rx="2"/><line x1="2" y1="7" x2="14" y2="7" opacity=".5"/></svg>팝업창</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="scrolllist"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="1" width="12" height="14" rx="1.5"/><line x1="3" y1="4.5" x2="11" y2="4.5"/><line x1="3" y1="7.5" x2="11" y2="7.5"/><line x1="3" y1="10.5" x2="9" y2="10.5"/><rect x="14" y="3" width="2" height="5" rx="1" fill="currentColor" opacity=".3"/></svg>스크롤 리스트</div>
+          <div class="wf-comp-item" draggable="true" data-wftype="tab"><svg class="wf-comp-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="5" width="14" height="10" rx="1.5"/><rect x="1" y="2" width="4" height="4" rx="1"/><rect x="6.5" y="3" width="4" height="3" rx="1" opacity=".5"/></svg>탭 UI</div>
+        </div>
+      </div>
+      <div id="wf-layers">
+        <div id="wf-layers-header">레이어</div>
+        <div id="wf-layers-list"></div>
+      </div>
+    </div>
+    <div id="wf-main">
+      <div id="wf-canvas-wrap">
+        <div id="wf-canvas-area">
+          <div id="wf-canvas">
+            <div class="wf-grid-overlay" id="wf-grid-overlay" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="wf-props">
+      <div id="wf-props-header">속성</div>
+      <div id="wf-props-body">
+        <div id="wf-no-sel">요소를 선택하거나<br>컴포넌트를 캔버스에<br>드래그해서 놓으세요</div>
+        <div id="wf-sel-props" style="display:none">
+          <div id="wf-prop-type-badge" class="wf-prop-type-badge">rect</div>
+          <div class="wf-prop-row"><div class="wf-prop-label">이름</div><input class="wf-prop-input" id="wf-prop-name" oninput="wfUpdateProp('name',this.value)"></div>
+          <div class="wf-prop-divider"></div>
+          <div class="wf-prop-row wf-prop-row-2">
+            <div><div class="wf-prop-label">X</div><input class="wf-prop-input" id="wf-prop-x" type="number" oninput="wfUpdateProp('x',+this.value)"></div>
+            <div><div class="wf-prop-label">Y</div><input class="wf-prop-input" id="wf-prop-y" type="number" oninput="wfUpdateProp('y',+this.value)"></div>
+          </div>
+          <div class="wf-prop-row wf-prop-row-2">
+            <div><div class="wf-prop-label">W</div><input class="wf-prop-input" id="wf-prop-w" type="number" oninput="wfUpdateProp('w',+this.value)"></div>
+            <div><div class="wf-prop-label">H</div><input class="wf-prop-input" id="wf-prop-h" type="number" oninput="wfUpdateProp('h',+this.value)"></div>
+          </div>
+          <div class="wf-prop-divider"></div>
+          <div class="wf-prop-row"><div class="wf-prop-label">레이블</div><input class="wf-prop-input" id="wf-prop-label" oninput="wfUpdateProp('label',this.value)"></div>
+          <div class="wf-prop-row">
+            <div class="wf-prop-label">불투명도 <span id="wf-prop-opacity-val" style="color:#7eb8f7">100%</span></div>
+            <input class="wf-prop-input" id="wf-prop-opacity" type="range" min="10" max="100" value="100" oninput="wfUpdateProp('opacity',+this.value/100);document.getElementById('wf-prop-opacity-val').textContent=this.value+'%'">
+          </div>
+          <button class="wf-del-btn" onclick="wfDeleteSelected()">삭제 (Del)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="wf-statusbar">
+    <span id="wf-status-pos">x: 0  y: 0</span>
+    <span id="wf-status-sel">선택 없음</span>
+    <span id="wf-status-count">요소 0개</span>
+  </div>
+</div>
 </body>
 </html>
